@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, Code, Sparkles, Github, Mail, MapPin, Clock, ExternalLink, FileText, Star, Zap, Trophy, Heart } from 'lucide-react';
+import { Calendar, Users, Code, Sparkles, Github, Mail, MapPin, Clock, ExternalLink, FileText, Star, Zap, Trophy, Heart, X, Info } from 'lucide-react';
 
 const CodeXCultureWebsite = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showTeamModal, setShowTeamModal] = useState(null); // null, '2024', or '2025'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,8 +64,99 @@ const CodeXCultureWebsite = () => {
     }
   };
 
+  const TeamModal = ({ year, onClose }) => {
+    const is2025 = year === '2025';
+    const teamMembers = is2025 ? team2025 : team2024;
+    const testers = is2025 ? testers2025 : [tester2024];
+    
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className={`relative max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-gradient-to-br ${
+          is2025 ? 'from-cyan-900/95 to-blue-900/95' : 'from-purple-900/95 to-slate-900/95'
+        } backdrop-blur-xl rounded-3xl border ${
+          is2025 ? 'border-cyan-500/40' : 'border-purple-500/40'
+        } shadow-2xl`}>
+          <div className="sticky top-0 bg-gradient-to-r from-black/50 to-transparent backdrop-blur-sm p-6 border-b border-white/10 rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <h3 className={`text-3xl font-bold ${
+                is2025 ? 'text-cyan-300' : 'text-purple-300'
+              }`}>
+                {year} Team Details
+              </h3>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/10 rounded-xl transition-colors duration-300 group"
+              >
+                <X className="h-6 w-6 text-gray-300 group-hover:text-white" />
+              </button>
+            </div>
+          </div>
+          
+          <div className="p-8 space-y-8">
+            {/* Problem Setters/Organizing Team */}
+            <div>
+              <h4 className={`text-2xl font-bold mb-6 ${
+                is2025 ? 'text-cyan-400' : 'text-purple-400'
+              }`}>
+                {is2025 ? 'Problem Setters' : 'Organizing Team'}
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {teamMembers.map((member, idx) => (
+                  <div
+                    key={idx}
+                    className={`bg-gradient-to-br ${
+                      is2025 ? 'from-cyan-800/40 to-blue-800/40 border-cyan-600/30' : 'from-purple-800/40 to-slate-800/40 border-purple-600/30'
+                    } backdrop-blur-sm p-4 rounded-xl border hover:border-opacity-60 transition-all duration-300 hover:scale-105`}
+                  >
+                    <div className={`w-12 h-12 bg-gradient-to-br ${
+                      is2025 ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'
+                    } rounded-xl flex items-center justify-center mb-3 mx-auto`}>
+                      <span className="text-sm font-bold text-white">
+                        {member.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-center text-gray-200">{member}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Problem Testers */}
+            <div>
+              <h4 className="text-2xl font-bold mb-6 text-emerald-400">Problem Testers</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {testers.map((tester, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gradient-to-br from-emerald-800/40 to-teal-800/40 backdrop-blur-sm p-6 rounded-xl border border-emerald-600/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-105"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                      <span className="text-lg font-bold text-white">
+                        {tester.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                    <p className="text-lg font-semibold text-center text-gray-200">{tester}</p>
+                    <p className="text-sm text-center text-emerald-400 mt-2">Problem Tester</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-x-hidden">
+      {/* Team Modal */}
+      {showTeamModal && (
+        <TeamModal 
+          year={showTeamModal} 
+          onClose={() => setShowTeamModal(null)} 
+        />
+      )}
+
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
@@ -87,7 +179,7 @@ const CodeXCultureWebsite = () => {
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+      <nav className={`fixed top-0 w-full z-40 transition-all duration-500 ${
         isScrolled 
           ? 'bg-slate-900/90 backdrop-blur-xl border-b border-purple-500/30 shadow-2xl shadow-purple-500/10' 
           : 'bg-transparent'
@@ -304,30 +396,19 @@ const CodeXCultureWebsite = () => {
                         </div>
                         <p className="text-sm text-pink-300">Contest links and rules will be updated soon!</p>
                       </div>
+                      
+                      {/* Team Info Button */}
+                      <button
+                        onClick={() => setShowTeamModal('2025')}
+                        className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 text-sm rounded-xl transition-all duration-300 font-medium group/btn mb-4"
+                      >
+                        <Info className="h-4 w-4 group-hover/btn:rotate-12 transition-transform duration-300" />
+                        <span>View Team Details</span>
+                      </button>
+                      
                       <div className="flex items-center justify-end mt-4 text-sm text-pink-400">
                         <Clock className="h-4 w-4 mr-2" />
                         <span className="font-medium">June 2025</span>
-                      </div>
-                    </div>
-                    
-                    {/* 2025 Team Hover Card */}
-                    <div className="absolute -top-4 -right-4 w-80 bg-gradient-to-br from-cyan-900/95 to-blue-900/95 backdrop-blur-xl p-6 rounded-2xl border border-cyan-500/40 opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-95 group-hover:scale-100 z-20 pointer-events-none shadow-2xl">
-                      <h4 className="text-lg font-bold text-cyan-300 mb-4">2025 Team</h4>
-                      <div className="space-y-3 mb-4">
-                        <h5 className="text-sm font-semibold text-cyan-400">Problem Setters:</h5>
-                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-300">
-                          {team2025.map((member, idx) => (
-                            <div key={idx} className="bg-cyan-800/30 px-2 py-1 rounded">{member}</div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h5 className="text-sm font-semibold text-emerald-400">Problem Testers:</h5>
-                        <div className="text-xs text-gray-300 space-y-1">
-                          {testers2025.map((tester, idx) => (
-                            <div key={idx} className="bg-emerald-800/30 px-2 py-1 rounded">{tester}</div>
-                          ))}
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -365,29 +446,19 @@ const CodeXCultureWebsite = () => {
                           <FileText className="h-4 w-4 mr-2 group-hover/link:scale-110 transition-transform duration-300" />
                           Rules & Guidelines
                         </a>
+                        
+                        {/* Team Info Button */}
+                        <button
+                          onClick={() => setShowTeamModal('2024')}
+                          className="inline-flex items-center justify-center px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-sm rounded-xl transition-all duration-300 font-medium group/btn"
+                        >
+                          <Info className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
+                          View Team Details
+                        </button>
                       </div>
                       <div className="flex items-center mt-4 text-sm text-purple-400">
                         <Clock className="h-4 w-4 mr-2" />
                         <span className="font-medium">June 2024</span>
-                      </div>
-                    </div>
-                    
-                    {/* 2024 Team Hover Card */}
-                    <div className="absolute -top-4 -left-4 w-80 bg-gradient-to-br from-purple-900/95 to-slate-900/95 backdrop-blur-xl p-6 rounded-2xl border border-purple-500/40 opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-95 group-hover:scale-100 z-20 pointer-events-none shadow-2xl">
-                      <h4 className="text-lg font-bold text-purple-300 mb-4">2024 Founding Team</h4>
-                      <div className="space-y-3 mb-4">
-                        <h5 className="text-sm font-semibold text-purple-400">Organizing Team:</h5>
-                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-300">
-                          {team2024.map((member, idx) => (
-                            <div key={idx} className="bg-purple-800/30 px-2 py-1 rounded">{member}</div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h5 className="text-sm font-semibold text-yellow-400">Problem Tester:</h5>
-                        <div className="text-xs text-gray-300">
-                          <div className="bg-yellow-800/30 px-2 py-1 rounded">{tester2024}</div>
-                        </div>
                       </div>
                     </div>
                   </div>
